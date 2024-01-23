@@ -23,11 +23,7 @@
  */
 package org.jeasy.flows.workflow;
 
-import org.jeasy.flows.work.NoOpWork;
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReport;
-import org.jeasy.flows.work.WorkReportPredicate;
+import org.jeasy.flows.action.*;
 
 import java.util.UUID;
 
@@ -35,24 +31,23 @@ import java.util.UUID;
  * A conditional flow is defined by 4 artifacts:
  *
  * <ul>
- *     <li>The work to execute first</li>
+ *     <li>The action to execute first</li>
  *     <li>A predicate for the conditional logic</li>
- *     <li>The work to execute if the predicate is satisfied</li>
- *     <li>The work to execute if the predicate is not satisfied (optional)</li>
+ *     <li>The action to execute if the predicate is satisfied</li>
+ *     <li>The action to execute if the predicate is not satisfied (optional)</li>
  * </ul>
  *
- * @see ConditionalFlow.Builder
- *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
+ * @see ConditionalFlow.Builder
  */
 public class ConditionalFlow extends AbstractWorkFlow {
 
-    private final Work initialWorkUnit, nextOnPredicateSuccess, nextOnPredicateFailure;
-    private final WorkReportPredicate predicate;
+    private final Action initialActionUnit, nextOnPredicateSuccess, nextOnPredicateFailure;
+    private final ActionReportPredicate predicate;
 
-    ConditionalFlow(String name, Work initialWorkUnit, Work nextOnPredicateSuccess, Work nextOnPredicateFailure, WorkReportPredicate predicate) {
+    ConditionalFlow(String name, Action initialActionUnit, Action nextOnPredicateSuccess, Action nextOnPredicateFailure, ActionReportPredicate predicate) {
         super(name);
-        this.initialWorkUnit = initialWorkUnit;
+        this.initialActionUnit = initialActionUnit;
         this.nextOnPredicateSuccess = nextOnPredicateSuccess;
         this.nextOnPredicateFailure = nextOnPredicateFailure;
         this.predicate = predicate;
@@ -61,13 +56,13 @@ public class ConditionalFlow extends AbstractWorkFlow {
     /**
      * {@inheritDoc}
      */
-    public WorkReport execute(WorkContext workContext) {
-        WorkReport jobReport = initialWorkUnit.execute(workContext);
+    public ActionReport execute(ActionContext actionContext) {
+        ActionReport jobReport = initialActionUnit.execute(actionContext);
         if (predicate.apply(jobReport)) {
-            jobReport = nextOnPredicateSuccess.execute(workContext);
+            jobReport = nextOnPredicateSuccess.execute(actionContext);
         } else {
-            if (nextOnPredicateFailure != null && !(nextOnPredicateFailure instanceof NoOpWork)) { // else is optional
-                jobReport = nextOnPredicateFailure.execute(workContext);
+            if (nextOnPredicateFailure != null && !(nextOnPredicateFailure instanceof NoOpAction)) { // else is optional
+                jobReport = nextOnPredicateFailure.execute(actionContext);
             }
         }
         return jobReport;
@@ -88,19 +83,19 @@ public class ConditionalFlow extends AbstractWorkFlow {
         }
 
         public interface ExecuteStep {
-            WhenStep execute(Work initialWorkUnit);
+            WhenStep execute(Action initialActionUnit);
         }
 
         public interface WhenStep {
-            ThenStep when(WorkReportPredicate predicate);
+            ThenStep when(ActionReportPredicate predicate);
         }
 
         public interface ThenStep {
-            OtherwiseStep then(Work work);
+            OtherwiseStep then(Action action);
         }
 
         public interface OtherwiseStep extends BuildStep {
-            BuildStep otherwise(Work work);
+            BuildStep otherwise(Action action);
         }
 
         public interface BuildStep {
@@ -110,15 +105,15 @@ public class ConditionalFlow extends AbstractWorkFlow {
         private static class BuildSteps implements NameStep, ExecuteStep, WhenStep, ThenStep, OtherwiseStep, BuildStep {
 
             private String name;
-            private Work initialWorkUnit, nextOnPredicateSuccess, nextOnPredicateFailure;
-            private WorkReportPredicate predicate;
+            private Action initialActionUnit, nextOnPredicateSuccess, nextOnPredicateFailure;
+            private ActionReportPredicate predicate;
 
             BuildSteps() {
                 this.name = UUID.randomUUID().toString();
-                this.initialWorkUnit = new NoOpWork();
-                this.nextOnPredicateSuccess = new NoOpWork();
-                this.nextOnPredicateFailure = new NoOpWork();
-                this.predicate = WorkReportPredicate.ALWAYS_FALSE;
+                this.initialActionUnit = new NoOpAction();
+                this.nextOnPredicateSuccess = new NoOpAction();
+                this.nextOnPredicateFailure = new NoOpAction();
+                this.predicate = ActionReportPredicate.ALWAYS_FALSE;
             }
 
             @Override
@@ -128,34 +123,32 @@ public class ConditionalFlow extends AbstractWorkFlow {
             }
 
             @Override
-            public WhenStep execute(Work initialWorkUnit) {
-                this.initialWorkUnit = initialWorkUnit;
+            public WhenStep execute(Action initialActionUnit) {
+                this.initialActionUnit = initialActionUnit;
                 return this;
             }
 
             @Override
-            public ThenStep when(WorkReportPredicate predicate) {
+            public ThenStep when(ActionReportPredicate predicate) {
                 this.predicate = predicate;
                 return this;
             }
 
             @Override
-            public OtherwiseStep then(Work work) {
-                this.nextOnPredicateSuccess = work;
+            public OtherwiseStep then(Action action) {
+                this.nextOnPredicateSuccess = action;
                 return this;
             }
 
             @Override
-            public BuildStep otherwise(Work work) {
-                this.nextOnPredicateFailure = work;
+            public BuildStep otherwise(Action action) {
+                this.nextOnPredicateFailure = action;
                 return this;
             }
 
             @Override
             public ConditionalFlow build() {
-                return new ConditionalFlow(this.name, this.initialWorkUnit,
-                        this.nextOnPredicateSuccess, this.nextOnPredicateFailure,
-                        this.predicate);
+                return new ConditionalFlow(this.name, this.initialActionUnit, this.nextOnPredicateSuccess, this.nextOnPredicateFailure, this.predicate);
             }
         }
     }

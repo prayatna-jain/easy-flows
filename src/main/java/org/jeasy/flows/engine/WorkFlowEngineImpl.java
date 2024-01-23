@@ -23,8 +23,8 @@
  */
 package org.jeasy.flows.engine;
 
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReport;
+import org.jeasy.flows.action.ActionContext;
+import org.jeasy.flows.action.ActionReport;
 import org.jeasy.flows.workflow.WorkFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +34,9 @@ class WorkFlowEngineImpl implements WorkFlowEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkFlowEngineImpl.class);
 
-    public WorkReport run(WorkFlow workFlow, WorkContext workContext) {
+    public ActionReport run(WorkFlow workFlow, ActionContext actionContext) {
         LOGGER.info("Running workflow ''{}''", workFlow.getName());
-        return workFlow.execute(workContext);
+        return workFlow.execute(actionContext);
     }
 
 }

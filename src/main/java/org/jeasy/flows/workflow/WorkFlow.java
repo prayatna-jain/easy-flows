@@ -23,13 +23,13 @@
  */
 package org.jeasy.flows.workflow;
 
-import org.jeasy.flows.work.Work;
+import org.jeasy.flows.action.Action;
 
 /**
- * Interface to define a flow of work units. A workflow is also a work, this is 
+ * Interface to define a flow of action units. A workflow is also an action, this is
  * what makes workflows composable.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-public interface WorkFlow extends Work {
+public interface WorkFlow extends Action {
 }

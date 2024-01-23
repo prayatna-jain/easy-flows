@@ -21,35 +21,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.workflow;
+package org.jeasy.flows.action;
 
 import org.assertj.core.api.Assertions;
-import org.jeasy.flows.action.Action;
-import org.jeasy.flows.action.ActionContext;
+import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import java.util.Arrays;
-import java.util.List;
+public class NoOpWorkTest {
 
-public class ParallelFlowTest {
+	private final NoOpAction action = new NoOpAction();
 
-    @Test
-    public void testExecute() {
-        // given
-        Action work1 = Mockito.mock(Action.class);
-        Action work2 = Mockito.mock(Action.class);
-        ActionContext actionContext = Mockito.mock(ActionContext.class);
-        ParallelFlowExecutor parallelFlowExecutor = Mockito.mock(ParallelFlowExecutor.class);
-        List<Action> works = Arrays.asList(work1, work2);
-        ParallelFlow parallelFlow = new ParallelFlow("pf", works, parallelFlowExecutor);
+	@Test
+	public void getName() {
+		Assertions.assertThat(action.getName()).isNotNull();
+	}
 
-        // when
-        ParallelFlowReport parallelFlowReport = parallelFlow.execute(actionContext);
+	@Test
+	public void testExecute() {
+		ActionReport actionReport = action.execute(new ActionContext());
+		Assert.assertNotNull(actionReport);
+		Assertions.assertThat(actionReport.getStatus()).isEqualTo(ActionStatus.COMPLETED);
 
-        // then
-        Assertions.assertThat(parallelFlowReport).isNotNull();
-        Mockito.verify(parallelFlowExecutor).executeInParallel(works, actionContext);
-    }
-
+	}
 }

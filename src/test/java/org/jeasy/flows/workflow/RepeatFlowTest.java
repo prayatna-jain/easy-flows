@@ -23,9 +23,9 @@
  */
 package org.jeasy.flows.workflow;
 
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReportPredicate;
+import org.jeasy.flows.action.Action;
+import org.jeasy.flows.action.ActionContext;
+import org.jeasy.flows.action.ActionReportPredicate;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -34,36 +34,36 @@ public class RepeatFlowTest {
     @Test
     public void testRepeatUntil() {
         // given
-        Work work = Mockito.mock(Work.class);
-        WorkContext workContext = Mockito.mock(WorkContext.class);
-        WorkReportPredicate predicate = WorkReportPredicate.ALWAYS_FALSE;
+        Action action = Mockito.mock(Action.class);
+        ActionContext actionContext = Mockito.mock(ActionContext.class);
+        ActionReportPredicate predicate = ActionReportPredicate.ALWAYS_FALSE;
         RepeatFlow repeatFlow = RepeatFlow.Builder.aNewRepeatFlow()
-                .repeat(work)
+                .repeat(action)
                 .until(predicate)
                 .build();
 
         // when
-        repeatFlow.execute(workContext);
+        repeatFlow.execute(actionContext);
 
         // then
-        Mockito.verify(work, Mockito.times(1)).execute(workContext);
+        Mockito.verify(action, Mockito.times(1)).execute(actionContext);
     }
 
     @Test
     public void testRepeatTimes() {
         // given
-        Work work = Mockito.mock(Work.class);
-        WorkContext workContext = Mockito.mock(WorkContext.class);
+        Action action = Mockito.mock(Action.class);
+        ActionContext actionContext = Mockito.mock(ActionContext.class);
         RepeatFlow repeatFlow = RepeatFlow.Builder.aNewRepeatFlow()
-                .repeat(work)
+                .repeat(action)
                 .times(3)
                 .build();
 
         // when
-        repeatFlow.execute(workContext);
+        repeatFlow.execute(actionContext);
 
         // then
-        Mockito.verify(work, Mockito.times(3)).execute(workContext);
+        Mockito.verify(action, Mockito.times(3)).execute(actionContext);
     }
 
 }

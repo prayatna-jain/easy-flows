@@ -21,22 +21,24 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
+
+import java.util.UUID;
 
 /**
- * Work execution status enumeration.
+ * No operation action.
  *
- * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com).
+ * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-public enum WorkStatus {
+public class NoOpAction implements Action {
 
-    /**
-     * The unit of work has failed.
-     */
-    FAILED,
+    @Override
+    public String getName() {
+        return UUID.randomUUID().toString();
+    }
 
-    /**
-     * The unit of work has completed successfully
-     */
-    COMPLETED
+    @Override
+    public ActionReport execute(ActionContext actionContext) {
+        return new DefaultActionReport(ActionStatus.COMPLETED, actionContext);
+    }
 }

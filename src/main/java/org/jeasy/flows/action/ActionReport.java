@@ -21,59 +21,35 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
 
 /**
- * Default implementation of {@link WorkReport}.
+ * Execution report of a unit of action.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-public class DefaultWorkReport implements WorkReport {
-
-    private final WorkStatus status;
-    private final WorkContext workContext;
-    private Throwable error;
+public interface ActionReport {
 
     /**
-     * Create a new {@link DefaultWorkReport}.
-     *
-     * @param status of work
+     * Get action execution status.
+     * 
+     * @return execution status
      */
-    public DefaultWorkReport(WorkStatus status, WorkContext workContext) {
-        this.status = status;
-        this.workContext = workContext;
-    }
+    ActionStatus getStatus();
 
     /**
-     * Create a new {@link DefaultWorkReport}.
+     * Get error if any. Might be {@code null}, but usually not null when
+     * the status is {@link ActionStatus#FAILED}. Typically the exception includes
+     * the exit code that might be used to drive the flow execution accordingly.
      *
-     * @param status of work
-     * @param error if any
+     * @return error
      */
-    public DefaultWorkReport(WorkStatus status, WorkContext workContext, Throwable error) {
-        this(status, workContext);
-        this.error = error;
-    }
+    Throwable getError();
 
-    public WorkStatus getStatus() {
-        return status;
-    }
+    /**
+     * Get the last action context of the flow
+     * @return last action context of the flow
+     */
+    ActionContext getActionContext();
 
-    public Throwable getError() {
-        return error;
-    }
-
-    @Override
-    public WorkContext getWorkContext() {
-        return workContext;
-    }
-
-    @Override
-    public String toString() {
-        return "DefaultWorkReport {" +
-                "status=" + status +
-                ", context=" + workContext +
-                ", error=" + (error == null ? "''" : error) +
-                '}';
-    }
 }

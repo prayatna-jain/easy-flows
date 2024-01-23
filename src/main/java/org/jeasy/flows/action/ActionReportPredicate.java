@@ -21,37 +21,37 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A predicate interface on work report.
+ * A predicate interface on action report.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 @FunctionalInterface
-public interface WorkReportPredicate {
+public interface ActionReportPredicate {
 
     /**
-     * Apply the predicate on the given work report.
+     * Apply the predicate on the given action report.
      * 
-     * @param workReport on which the predicate should be applied
+     * @param actionReport on which the predicate should be applied
      * @return true if the predicate applies on the given report, false otherwise
      */
-    boolean apply(WorkReport workReport);
+    boolean apply(ActionReport actionReport);
 
-    WorkReportPredicate ALWAYS_TRUE = workReport -> true;
-    WorkReportPredicate ALWAYS_FALSE = workReport -> false;
-    WorkReportPredicate COMPLETED = workReport -> workReport.getStatus().equals(WorkStatus.COMPLETED);
-    WorkReportPredicate FAILED = workReport -> workReport.getStatus().equals(WorkStatus.FAILED);
+    ActionReportPredicate ALWAYS_TRUE = actionReport -> true;
+    ActionReportPredicate ALWAYS_FALSE = actionReport -> false;
+    ActionReportPredicate COMPLETED = actionReport -> actionReport.getStatus().equals(ActionStatus.COMPLETED);
+    ActionReportPredicate FAILED = actionReport -> actionReport.getStatus().equals(ActionStatus.FAILED);
 
     /**
      * A predicate that returns true after a given number of times.
      *
      * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
      */
-    class TimesPredicate implements WorkReportPredicate {
+    class TimesPredicate implements ActionReportPredicate {
 
         private final int times;
 
@@ -62,7 +62,7 @@ public interface WorkReportPredicate {
         }
 
         @Override
-        public boolean apply(WorkReport workReport) {
+        public boolean apply(ActionReport actionReport) {
             return counter.incrementAndGet() != times;
         }
 

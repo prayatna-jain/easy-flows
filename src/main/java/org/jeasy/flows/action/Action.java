@@ -21,24 +21,41 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
 
 import java.util.UUID;
 
 /**
- * No operation work.
+ * This interface represents a unit of action. Implementations of this interface must:
+ * 
+ * <ul>
+ *     <li>catch any checked or unchecked exceptions and return a {@link ActionReport}
+ *     instance with a status of {@link ActionStatus#FAILED} and a reference to the exception</li>
+ *     <li>make sure the action is finished in a finite amount of time</li>
+ * </ul>
  *
+ * Action name must be unique within a workflow definition.
+ * 
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-public class NoOpWork implements Work {
+public interface Action {
 
-    @Override
-    public String getName() {
+    /**
+     * The name of the unit of action. The name must be unique within a workflow definition.
+     * 
+     * @return name of the unit of action.
+     */
+    default String getName() {
         return UUID.randomUUID().toString();
     }
 
-    @Override
-    public WorkReport execute(WorkContext workContext) {
-        return new DefaultWorkReport(WorkStatus.COMPLETED, workContext);
-    }
+    /**
+     * Execute the unit of action and return its report. Implementations are required
+     * to catch any checked or unchecked exceptions and return a {@link ActionReport} instance
+     * with a status of {@link ActionStatus#FAILED} and a reference to the exception.
+     * 
+     * @param actionContext context in which this unit of action is being executed
+     * @return the execution report
+     */
+    ActionReport execute(ActionContext actionContext);
 }

@@ -26,8 +26,8 @@ package org.jeasy.flows.workflow;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
+import org.jeasy.flows.action.Action;
+import org.jeasy.flows.action.ActionContext;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -37,10 +37,10 @@ public class SequentialFlowTest {
     @Test
     public void testExecute() {
         // given
-        Work work1 = Mockito.mock(Work.class);
-        Work work2 = Mockito.mock(Work.class);
-        Work work3 = Mockito.mock(Work.class);
-        WorkContext workContext = Mockito.mock(WorkContext.class);
+        Action work1 = Mockito.mock(Action.class);
+        Action work2 = Mockito.mock(Action.class);
+        Action work3 = Mockito.mock(Action.class);
+        ActionContext actionContext = Mockito.mock(ActionContext.class);
         SequentialFlow sequentialFlow = SequentialFlow.Builder.aNewSequentialFlow()
                 .named("testFlow")
                 .execute(work1)
@@ -49,25 +49,25 @@ public class SequentialFlowTest {
                 .build();
 
         // when
-        sequentialFlow.execute(workContext);
+        sequentialFlow.execute(actionContext);
 
         // then
         InOrder inOrder = Mockito.inOrder(work1, work2, work3);
-        inOrder.verify(work1, Mockito.times(1)).execute(workContext);
-        inOrder.verify(work2, Mockito.times(1)).execute(workContext);
-        inOrder.verify(work3, Mockito.times(1)).execute(workContext);
+        inOrder.verify(work1, Mockito.times(1)).execute(actionContext);
+        inOrder.verify(work2, Mockito.times(1)).execute(actionContext);
+        inOrder.verify(work3, Mockito.times(1)).execute(actionContext);
     }
 
     @Test
     public void testPassingMultipleWorkUnitsAtOnce() {
         // given
-        Work work1 = Mockito.mock(Work.class);
-        Work work2 = Mockito.mock(Work.class);
-        Work work3 = Mockito.mock(Work.class);
-        Work work4 = Mockito.mock(Work.class);
-        WorkContext workContext = Mockito.mock(WorkContext.class);
-        List<Work> initialWorkUnits = Arrays.asList(work1, work2);
-        List<Work> nextWorkUnits = Arrays.asList(work3, work4);
+        Action work1 = Mockito.mock(Action.class);
+        Action work2 = Mockito.mock(Action.class);
+        Action work3 = Mockito.mock(Action.class);
+        Action work4 = Mockito.mock(Action.class);
+        ActionContext actionContext = Mockito.mock(ActionContext.class);
+        List<Action> initialWorkUnits = Arrays.asList(work1, work2);
+        List<Action> nextWorkUnits = Arrays.asList(work3, work4);
         SequentialFlow sequentialFlow = SequentialFlow.Builder.aNewSequentialFlow()
                 .named("testFlow")
                 .execute(initialWorkUnits)
@@ -75,14 +75,14 @@ public class SequentialFlowTest {
                 .build();
 
         // when
-        sequentialFlow.execute(workContext);
+        sequentialFlow.execute(actionContext);
 
         // then
         InOrder inOrder = Mockito.inOrder(work1, work2, work3, work4);
-        inOrder.verify(work1, Mockito.times(1)).execute(workContext);
-        inOrder.verify(work2, Mockito.times(1)).execute(workContext);
-        inOrder.verify(work3, Mockito.times(1)).execute(workContext);
-        inOrder.verify(work4, Mockito.times(1)).execute(workContext);
+        inOrder.verify(work1, Mockito.times(1)).execute(actionContext);
+        inOrder.verify(work2, Mockito.times(1)).execute(actionContext);
+        inOrder.verify(work3, Mockito.times(1)).execute(actionContext);
+        inOrder.verify(work4, Mockito.times(1)).execute(actionContext);
     }
 
 }

@@ -23,9 +23,9 @@
  */
 package org.jeasy.flows.workflow;
 
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReport;
+import org.jeasy.flows.action.Action;
+import org.jeasy.flows.action.ActionContext;
+import org.jeasy.flows.action.ActionReport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +33,12 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jeasy.flows.work.WorkStatus.FAILED;
+import static org.jeasy.flows.action.ActionStatus.FAILED;
 
 /**
- * A sequential flow executes a set of work units in sequence.
+ * A sequential flow executes a set of action units in sequence.
  *
- * If a unit of work fails, next work units in the pipeline will be skipped.
+ * If a unit of action fails, next action units in the pipeline will be skipped.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
@@ -46,26 +46,26 @@ public class SequentialFlow extends AbstractWorkFlow {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentialFlow.class.getName());
 
-    private final List<Work> workUnits = new ArrayList<>();
+    private final List<Action> actionUnits = new ArrayList<>();
 
-    SequentialFlow(String name, List<Work> workUnits) {
+    SequentialFlow(String name, List<Action> actionUnits) {
         super(name);
-        this.workUnits.addAll(workUnits);
+        this.actionUnits.addAll(actionUnits);
     }
 
     /**
      * {@inheritDoc}
      */
-    public WorkReport execute(WorkContext workContext) {
-        WorkReport workReport = null;
-        for (Work work : workUnits) {
-            workReport = work.execute(workContext);
-            if (workReport != null && FAILED.equals(workReport.getStatus())) {
-                LOGGER.info("Work unit ''{}'' has failed, skipping subsequent work units", work.getName());
+    public ActionReport execute(ActionContext actionContext) {
+        ActionReport actionReport = null;
+        for (Action action : actionUnits) {
+            actionReport = action.execute(actionContext);
+            if (actionReport != null && FAILED.equals(actionReport.getStatus())) {
+                LOGGER.info("Action unit ''{}'' has failed, skipping subsequent action units", action.getName());
                 break;
             }
         }
-        return workReport;
+        return actionReport;
     }
 
     public static class Builder {
@@ -83,24 +83,24 @@ public class SequentialFlow extends AbstractWorkFlow {
         }
 
         public interface ExecuteStep {
-            ThenStep execute(Work initialWork);
-            ThenStep execute(List<Work> initialWorkUnits);
+            ThenStep execute(Action initialAction);
+            ThenStep execute(List<Action> initialActionUnits);
         }
 
         public interface ThenStep {
-            ThenStep then(Work nextWork);
-            ThenStep then(List<Work> nextWorkUnits);
+            ThenStep then(Action nextAction);
+            ThenStep then(List<Action> nextActionUnits);
             SequentialFlow build();
         }
 
         private static class BuildSteps implements NameStep, ExecuteStep, ThenStep {
 
             private String name;
-            private final List<Work> works;
+            private final List<Action> actions;
             
             BuildSteps() {
                 this.name = UUID.randomUUID().toString();
-                this.works = new ArrayList<>();
+                this.actions = new ArrayList<>();
             }
             
             public ExecuteStep named(String name) {
@@ -109,32 +109,32 @@ public class SequentialFlow extends AbstractWorkFlow {
             }
 
             @Override
-            public ThenStep execute(Work initialWork) {
-                this.works.add(initialWork);
+            public ThenStep execute(Action initialAction) {
+                this.actions.add(initialAction);
                 return this;
             }
 
             @Override
-            public ThenStep execute(List<Work> initialWorkUnits) {
-                this.works.addAll(initialWorkUnits);
+            public ThenStep execute(List<Action> initialActionUnits) {
+                this.actions.addAll(initialActionUnits);
                 return this;
             }
 
             @Override
-            public ThenStep then(Work nextWork) {
-                this.works.add(nextWork);
+            public ThenStep then(Action nextAction) {
+                this.actions.add(nextAction);
                 return this;
             }
 
             @Override
-            public ThenStep then(List<Work> nextWorkUnits) {
-                this.works.addAll(nextWorkUnits);
+            public ThenStep then(List<Action> nextActionUnits) {
+                this.actions.addAll(nextActionUnits);
                 return this;
             }
 
             @Override
             public SequentialFlow build() {
-                return new SequentialFlow(this.name, this.works);
+                return new SequentialFlow(this.name, this.actions);
             }
         }
     }

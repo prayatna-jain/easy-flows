@@ -23,39 +23,39 @@
  */
 package org.jeasy.flows.workflow;
 
-import org.jeasy.flows.work.NoOpWork;
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReportPredicate;
-import org.jeasy.flows.work.WorkReport;
+import org.jeasy.flows.action.NoOpAction;
+import org.jeasy.flows.action.Action;
+import org.jeasy.flows.action.ActionContext;
+import org.jeasy.flows.action.ActionReportPredicate;
+import org.jeasy.flows.action.ActionReport;
 
 import java.util.UUID;
 
 /**
- * A repeat flow executes a work repeatedly until its report satisfies a given predicate.
+ * A repeat flow executes an action repeatedly until its report satisfies a given predicate.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 public class RepeatFlow extends AbstractWorkFlow {
 
-    private final Work work;
-    private final WorkReportPredicate predicate;
+    private final Action action;
+    private final ActionReportPredicate predicate;
 
-    RepeatFlow(String name, Work work, WorkReportPredicate predicate) {
+    RepeatFlow(String name, Action action, ActionReportPredicate predicate) {
         super(name);
-        this.work = work;
+        this.action = action;
         this.predicate = predicate;
     }
 
     /**
      * {@inheritDoc}
      */
-    public WorkReport execute(WorkContext workContext) {
-        WorkReport workReport;
+    public ActionReport execute(ActionContext actionContext) {
+        ActionReport actionReport;
         do {
-            workReport = work.execute(workContext);
-        } while (predicate.apply(workReport));
-        return workReport;
+            actionReport = action.execute(actionContext);
+        } while (predicate.apply(actionReport));
+        return actionReport;
     }
 
     public static class Builder {
@@ -73,11 +73,11 @@ public class RepeatFlow extends AbstractWorkFlow {
         }
 
         public interface RepeatStep {
-            UntilStep repeat(Work work);
+            UntilStep repeat(Action action);
         }
 
         public interface UntilStep {
-            BuildStep until(WorkReportPredicate predicate);
+            BuildStep until(ActionReportPredicate predicate);
             BuildStep times(int times);
         }
 
@@ -88,13 +88,13 @@ public class RepeatFlow extends AbstractWorkFlow {
         private static class BuildSteps implements NameStep, RepeatStep, UntilStep, BuildStep {
 
             private String name;
-            private Work work;
-            private WorkReportPredicate predicate;
+            private Action action;
+            private ActionReportPredicate predicate;
 
             BuildSteps() {
                 this.name = UUID.randomUUID().toString();
-                this.work = new NoOpWork();
-                this.predicate = WorkReportPredicate.ALWAYS_FALSE;
+                this.action = new NoOpAction();
+                this.predicate = ActionReportPredicate.ALWAYS_FALSE;
             }
             
             @Override
@@ -104,26 +104,26 @@ public class RepeatFlow extends AbstractWorkFlow {
             }
 
             @Override
-            public UntilStep repeat(Work work) {
-                this.work = work;
+            public UntilStep repeat(Action action) {
+                this.action = action;
                 return this;
             }
 
             @Override
-            public BuildStep until(WorkReportPredicate predicate) {
+            public BuildStep until(ActionReportPredicate predicate) {
                 this.predicate = predicate;
                 return this;
             }
 
             @Override
             public BuildStep times(int times) {
-                until(WorkReportPredicate.TimesPredicate.times(times));
+                until(ActionReportPredicate.TimesPredicate.times(times));
                 return this;
             }
 
             @Override
             public RepeatFlow build() {
-                return new RepeatFlow(name, work, predicate);
+                return new RepeatFlow(name, action, predicate);
             }
         }
 

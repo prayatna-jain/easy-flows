@@ -24,11 +24,8 @@
 package org.jeasy.flows.workflow;
 
 import org.assertj.core.api.Assertions;
-import org.jeasy.flows.work.DefaultWorkReport;
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReport;
-import org.jeasy.flows.work.WorkStatus;
+import org.jeasy.flows.action.*;
+import org.jeasy.flows.action.ActionStatus;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -44,13 +41,13 @@ public class ParallelFlowExecutorTest {
 
         // given
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        HelloWorldWork work1 = new HelloWorldWork("work1", WorkStatus.COMPLETED);
-        HelloWorldWork work2 = new HelloWorldWork("work2", WorkStatus.FAILED);
-        WorkContext workContext = Mockito.mock(WorkContext.class);
+        HelloWorldWork work1 = new HelloWorldWork("work1", ActionStatus.COMPLETED);
+        HelloWorldWork work2 = new HelloWorldWork("work2", ActionStatus.FAILED);
+        ActionContext actionContext = Mockito.mock(ActionContext.class);
         ParallelFlowExecutor parallelFlowExecutor = new ParallelFlowExecutor(executorService);
 
         // when
-        List<WorkReport> workReports = parallelFlowExecutor.executeInParallel(Arrays.asList(work1, work2), workContext);
+        List<ActionReport> workReports = parallelFlowExecutor.executeInParallel(Arrays.asList(work1, work2), actionContext);
         executorService.shutdown();
 
         // then
@@ -59,13 +56,13 @@ public class ParallelFlowExecutorTest {
         Assertions.assertThat(work2.isExecuted()).isTrue();
     }
 
-    static class HelloWorldWork implements Work {
+    static class HelloWorldWork implements Action {
 
         private final String name;
-        private final WorkStatus status;
+        private final ActionStatus status;
         private boolean executed;
 
-        HelloWorldWork(String name, WorkStatus status) {
+        HelloWorldWork(String name, ActionStatus status) {
             this.name = name;
             this.status = status;
         }
@@ -76,9 +73,9 @@ public class ParallelFlowExecutorTest {
         }
 
         @Override
-        public WorkReport execute(WorkContext workContext) {
+        public ActionReport execute(ActionContext actionContext) {
             executed = true;
-            return new DefaultWorkReport(status, workContext);
+            return new DefaultActionReport(status, actionContext);
         }
 
         public boolean isExecuted() {

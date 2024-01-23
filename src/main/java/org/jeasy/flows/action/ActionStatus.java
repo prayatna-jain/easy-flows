@@ -21,26 +21,22 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
-import org.junit.Test;
+/**
+ * Action execution status enumeration.
+ *
+ * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com).
+ */
+public enum ActionStatus {
 
-public class NoOpWorkTest {
+    /**
+     * The unit of action has failed.
+     */
+    FAILED,
 
-	private final NoOpWork work = new NoOpWork();
-
-	@Test
-	public void getName() {
-		Assertions.assertThat(work.getName()).isNotNull();
-	}
-
-	@Test
-	public void testExecute() {
-		WorkReport workReport = work.execute(new WorkContext());
-		Assert.assertNotNull(workReport);
-		Assertions.assertThat(workReport.getStatus()).isEqualTo(WorkStatus.COMPLETED);
-
-	}
+    /**
+     * The unit of action has completed successfully
+     */
+    COMPLETED
 }

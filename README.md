@@ -24,7 +24,7 @@
 
 Easy Flows is a workflow engine for Java. It provides simple APIs and building blocks to make it easy to create and run composable workflows.
 
-A unit of work in Easy Flows is represented by the `Work` interface. A work flow is represented by the `WorkFlow` interface.
+A unit of action in Easy Flows is represented by the `Action` interface. An action flow is represented by the `WorkFlow` interface.
 Easy Flows provides 4 implementations of the `WorkFlow` interface:
 
 <p align="center">
@@ -34,12 +34,12 @@ Easy Flows provides 4 implementations of the `WorkFlow` interface:
 Those are the only basic flows you need to know to start creating workflows with Easy Flows.
 You don't need to learn a complex notation or concepts, just a few natural APIs that are easy to think about.
 
-## How does it work?
+## How does it action?
 
-First let's write some work:
+First let's write some action:
 
 ```java
-class PrintMessageWork implements Work {
+class PrintMessageWork implements Action {
 
     private String message;
 
@@ -48,7 +48,7 @@ class PrintMessageWork implements Work {
     }
 
     public String getName() {
-        return "print message work";
+        return "print message action";
     }
 
     public WorkReport execute(WorkContext workContext) {
@@ -58,7 +58,7 @@ class PrintMessageWork implements Work {
 }
 ```
 
-This unit of work prints a given message to the standard output. Now let's suppose we want to create the following workflow:
+This unit of action prints a given message to the standard output. Now let's suppose we want to create the following workflow:
 
 1. print "foo" three times
 2. then print "hello" and "world" in parallel
@@ -72,7 +72,7 @@ This workflow can be illustrated as follows:
 
 * `flow1` is a `RepeatFlow` of `work1` which is printing "foo" three times
 * `flow2` is a `ParallelFlow` of `work2` and `work3` which respectively print "hello" and "world" in parallel
-* `flow3` is a `ConditionalFlow`. It first executes `flow2` (a workflow is also a work), then if `flow2` is completed, it executes `work4`, otherwise `work5` which respectively print "ok" and "nok"
+* `flow3` is a `ConditionalFlow`. It first executes `flow2` (a workflow is also an action), then if `flow2` is completed, it executes `work4`, otherwise `work5` which respectively print "ok" and "nok"
 * `flow4` is a `SequentialFlow`. It executes `flow1` then `flow3` in sequence.
 
 With Easy Flows, this workflow can be implemented with the following snippet:

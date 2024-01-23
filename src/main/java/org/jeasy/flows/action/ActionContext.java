@@ -21,21 +21,21 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Work execution context. This can be used to pass initial parameters to the
- * workflow and share data between work units.
+ * Action execution context. This can be used to pass initial parameters to the
+ * workflow and share data between action units.
  * 
- * <strong>Work context instances are thread-safe.</strong>
+ * <strong>Action context instances are thread-safe.</strong>
  * 
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-public class WorkContext {
+public class ActionContext {
 	
 	private final Map<String, Object> context = new ConcurrentHashMap<>();
 

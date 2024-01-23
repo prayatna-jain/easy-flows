@@ -23,9 +23,10 @@
  */
 package org.jeasy.flows.workflow;
 
-import org.jeasy.flows.work.Work;
-import org.jeasy.flows.work.WorkContext;
-import org.jeasy.flows.work.WorkReport;
+import org.jeasy.flows.action.ActionStatus;
+import org.jeasy.flows.action.Action;
+import org.jeasy.flows.action.ActionContext;
+import org.jeasy.flows.action.ActionReport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +35,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 /**
- * A parallel flow executes a set of work units in parallel. A {@link ParallelFlow}
- * requires a {@link ExecutorService} to execute work units in parallel using multiple
+ * A parallel flow executes a set of action units in parallel. A {@link ParallelFlow}
+ * requires a {@link ExecutorService} to execute action units in parallel using multiple
  * threads.
  * 
  * <strong>It is the responsibility of the caller to manage the lifecycle of the
@@ -44,30 +45,30 @@ import java.util.concurrent.ExecutorService;
  * The status of a parallel flow execution is defined as:
  *
  * <ul>
- *     <li>{@link org.jeasy.flows.work.WorkStatus#COMPLETED}: If all work units have successfully completed</li>
- *     <li>{@link org.jeasy.flows.work.WorkStatus#FAILED}: If one of the work units has failed</li>
+ *     <li>{@link ActionStatus#COMPLETED}: If all action units have successfully completed</li>
+ *     <li>{@link ActionStatus#FAILED}: If one of the action units has failed</li>
  * </ul>
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 public class ParallelFlow extends AbstractWorkFlow {
 
-    private final List<Work> workUnits = new ArrayList<>();
+    private final List<Action> actionUnits = new ArrayList<>();
     private final ParallelFlowExecutor workExecutor;
 
-    ParallelFlow(String name, List<Work> workUnits, ParallelFlowExecutor parallelFlowExecutor) {
+    ParallelFlow(String name, List<Action> actionUnits, ParallelFlowExecutor parallelFlowExecutor) {
         super(name);
-        this.workUnits.addAll(workUnits);
+        this.actionUnits.addAll(actionUnits);
         this.workExecutor = parallelFlowExecutor;
     }
 
     /**
      * {@inheritDoc}
      */
-    public ParallelFlowReport execute(WorkContext workContext) {
+    public ParallelFlowReport execute(ActionContext actionContext) {
         ParallelFlowReport workFlowReport = new ParallelFlowReport();
-        List<WorkReport> workReports = workExecutor.executeInParallel(workUnits, workContext);
-        workFlowReport.addAll(workReports);
+        List<ActionReport> actionReports = workExecutor.executeInParallel(actionUnits, actionContext);
+        workFlowReport.addAll(actionReports);
         return workFlowReport;
     }
 
@@ -86,18 +87,18 @@ public class ParallelFlow extends AbstractWorkFlow {
         }
 
         public interface ExecuteStep {
-            WithStep execute(Work... workUnits);
+            WithStep execute(Action... actionUnits);
         }
 
         public interface WithStep {
             /**
              *  A {@link ParallelFlow} requires an {@link ExecutorService} to
-             *  execute work units in parallel using multiple threads.
+             *  execute action units in parallel using multiple threads.
              *  
              *  <strong>It is the responsibility of the caller to manage the lifecycle
              *  of the executor service.</strong>
              *  
-             * @param executorService to use to execute work units in parallel
+             * @param executorService to use to execute action units in parallel
              * @return the builder instance
              */
             BuildStep with(ExecutorService executorService);
@@ -110,12 +111,12 @@ public class ParallelFlow extends AbstractWorkFlow {
         private static class BuildSteps implements NameStep, ExecuteStep, WithStep, BuildStep {
 
             private String name;
-            private final List<Work> works;
+            private final List<Action> actions;
             private ExecutorService executorService;
 
             public BuildSteps() {
                 this.name = UUID.randomUUID().toString();
-                this.works = new ArrayList<>();
+                this.actions = new ArrayList<>();
             }
 
             @Override
@@ -125,8 +126,8 @@ public class ParallelFlow extends AbstractWorkFlow {
             }
 
             @Override
-            public WithStep execute(Work... workUnits) {
-                this.works.addAll(Arrays.asList(workUnits));
+            public WithStep execute(Action... actionUnits) {
+                this.actions.addAll(Arrays.asList(actionUnits));
                 return this;
             }
             
@@ -139,7 +140,7 @@ public class ParallelFlow extends AbstractWorkFlow {
             @Override
             public ParallelFlow build() {
                 return new ParallelFlow(
-                        this.name, this.works,
+                        this.name, this.actions,
                         new ParallelFlowExecutor(this.executorService));
             }
         }

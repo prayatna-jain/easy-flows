@@ -21,35 +21,59 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.flows.work;
+package org.jeasy.flows.action;
 
 /**
- * Execution report of a unit of work.
+ * Default implementation of {@link ActionReport}.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-public interface WorkReport {
+public class DefaultActionReport implements ActionReport {
+
+    private final ActionStatus status;
+    private final ActionContext actionContext;
+    private Throwable error;
 
     /**
-     * Get work execution status.
-     * 
-     * @return execution status
-     */
-    WorkStatus getStatus();
-
-    /**
-     * Get error if any. Might be {@code null}, but usually not null when
-     * the status is {@link WorkStatus#FAILED}. Typically the exception includes
-     * the exit code that might be used to drive the flow execution accordingly.
+     * Create a new {@link DefaultActionReport}.
      *
-     * @return error
+     * @param status of action
      */
-    Throwable getError();
+    public DefaultActionReport(ActionStatus status, ActionContext actionContext) {
+        this.status = status;
+        this.actionContext = actionContext;
+    }
 
     /**
-     * Get the last work context of the flow
-     * @return last work context of the flow
+     * Create a new {@link DefaultActionReport}.
+     *
+     * @param status of action
+     * @param error if any
      */
-    WorkContext getWorkContext();
+    public DefaultActionReport(ActionStatus status, ActionContext actionContext, Throwable error) {
+        this(status, actionContext);
+        this.error = error;
+    }
 
+    public ActionStatus getStatus() {
+        return status;
+    }
+
+    public Throwable getError() {
+        return error;
+    }
+
+    @Override
+    public ActionContext getActionContext() {
+        return actionContext;
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultActionReport {" +
+                "status=" + status +
+                ", context=" + actionContext +
+                ", error=" + (error == null ? "''" : error) +
+                '}';
+    }
 }
